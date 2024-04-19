@@ -1,5 +1,6 @@
 #todo when modifying a number from the browser in an input, its type is changed to string int the backdend. perhaps because the number is stored in a dictionary without strict typing
 using GenieFramework, PlotlyBase, DataFrames
+using StippleLatex, Latexify
 import Base: length, iterate
 include("mppt.jl")
 @genietools
@@ -19,6 +20,8 @@ to_float(x) = typeof(x) == String ? parse(Float64, x) : x
 default_values = vcat(ModelingToolkit.defaults(sys)..., u0)
 component_list = [pv_input, power_input, pv, mppt, batter, load, dc_pv, dc_batter, ground]
 unknowns_list = map(string, unknowns(sys))
+
+latex_eqs = Dict(string(c.name) => replace(latexify(equations(c)),"align"=>"aligned") for c in component_list)
 
 function build_param_dict(components)
     prob_params = []
@@ -70,6 +73,7 @@ Stipple.stipple_parse(n::String,::Num) = convert(Float64,n) |> Num
                          )
     for c in component_list)
     @out component_names = [c.name for c in component_list]
+    @out equations = latex_eqs
     @out x = collect(1:5000)*1.0
     @out y = zeros(1:500)*1.0
     @out trace=[scatter()]
@@ -142,3 +146,5 @@ ui() = [
        ]
 #= @page("/",ui) =#
 @page("/", "app.jl.html")
+
+replace(latexify(equations(batter)), "\\\\" =>"\\")
