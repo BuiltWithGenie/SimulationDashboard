@@ -1,0 +1,33 @@
+<div class="row">
+    <div class="st-col col-12 col-sm st-module">
+        <plotly id="i8iv" :data="trace" :layout="layout" config="{'displaylogo':false}"></plotly>
+    </div>
+    <div id="ijtx" class="st-col st-module col-3">
+        <q-select id="iyac5" v-model="selected_unknown" label="States to plot" :options="uknowns" :multiple="true" :use-chips="true"></q-select>
+        <q-input id="i9yu7" :dense="true" label="Duration (ms)" type="number" v-model="T"></q-input>
+        <q-btn id="iwqy" label="Simulate" v-on:click="simulate = true" :disable="simulate" color="dark"></q-btn>
+        <q-img id="i93oo" src="diagram.png"></q-img>
+    </div>
+</div>
+<div class="row">
+    <div class="st-col col-12 col-sm st-module">
+        <h5>Components</h5>
+        <q-select id="ifbn" v-model="selected_comp" label="Component" :options="component_names"></q-select>
+    </div>
+    <div class="st-col col-12 col-sm st-module">
+        <div class="w-1/2 st-col col">
+            <h5>Parameters</h5>
+            <div v-for="(val,p) in components[selected_comp]['parameters']" class="st-col col">
+                <q-input id="i9n4d" label="p" v-model="components[selected_comp]['parameters'][p]" type="number"></q-input>
+            </div>
+        </div>
+    </div>
+    <div class="st-col col-12 col-sm st-module">
+        <div class="st-col col">
+            <h5>Initial state values</h5>
+            <div v-for="(val,p) in components[selected_comp]['states']" class="st-col col">
+                <q-input id="io9dk" label="p+'(t)'" v-model="components[selected_comp]['states'][p]" type="number"></q-input>
+            </div>
+        </div>
+    </div>
+</div>
