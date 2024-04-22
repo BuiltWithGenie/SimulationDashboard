@@ -6,7 +6,15 @@
         <q-select id="iyac5" v-model="selected_unknown" label="States to plot" :options="uknowns" :multiple="true" :use-chips="true"></q-select>
         <q-input id="i9yu7" :dense="true" label="Duration (ms)" type="number" v-model="T"></q-input>
         <q-btn id="iwqy" label="Simulate" v-on:click="simulate = true" :disable="simulate" color="dark"></q-btn>
-        <h6 style="position:absolute;bottom:160px;left:25%">Solar panel MPPT</h6>
+        <h6 style="position:absolute;bottom:160px;left:20%">Solar panel MPPT 
+    <q-icon id="icskg" color="info" name="info" size="28px" style="cursor:pointer">
+        <q-popup-proxy>
+            <q-banner style="width:500px">
+                This dashboard simulates one of the examples in the <a href="https://ai4energy.github.io/Ai4EComponentLib.jl/dev/tutorials/Electrochemistry/#MPPT-Controller"> Ai4EComponentLib.jl</a> package, a library of ModelingToolkit models. The circuit implements a MPPT controller, which  tracks the maximum voltage current (VI) value so that the system can charge the battery at the maximum power output.
+            </q-banner>
+        </q-popup-proxy>
+    </q-icon>
+        </h6>
         <q-img id="i93oo" src="diagram.png"></q-img>
     </div>
 </div>

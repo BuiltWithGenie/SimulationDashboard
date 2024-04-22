@@ -100,7 +100,6 @@ Stipple.stipple_parse(n::String,::Num) = convert(Float64,n) |> Num
     @onbutton simulate begin
         param_values = Dict( eval(Meta.parse(c["name"]*"."*string(p.first))) => to_float(p.second) for c in values(components) for p in c["parameters"])
         state_values = Dict( eval(Meta.parse(c["name"]*"."*string(p.first))) => to_float(p.second) for c in values(components) for p in c["states"])
-        @show state_values
         u0 = [
               batter.v_s => 0.1,
               batter.v_f => 0.1,
@@ -117,13 +116,11 @@ Stipple.stipple_parse(n::String,::Num) = convert(Float64,n) |> Num
     end
     @onchange selected_unknown begin
         #= trace = [scatter()] =#
-        @show S[!,selected_unknown]
         trace[!] = []
         for u in selected_unknown
             push!(trace,scatter(x=S[!,:t], y=S[!,u],mode="lines", name=u))
         end
     trace = copy(trace)
-        @show trace
     end
 
     #= @in u = [] =#
