@@ -1,21 +1,21 @@
 <div class="row">
     <div class="st-col col-12 col-sm st-module">
-        <h6>Solar panel MPPT</h6><br>
+        <h2>Solar panel MPPT</h2><br>
         This dashboard simulates one of the examples in the <a href="https://ai4energy.github.io/Ai4EComponentLib.jl/dev/tutorials/Electrochemistry/#MPPT-Controller"> Ai4EComponentLib.jl</a> package, a library of ModelingToolkit models. The circuit implements a MPPT controller, which tracks the maximum voltage current (VI) value so that the system can charge the battery at the maximum power output.
     </div>
-    <div id="it9g5" class="st-col col-3 st-module">
+    <div id="it9g5" class="st-col col-3 st-module" style="background-color: #ffffff; padding-top: 25px !important;">
         <q-img id="i8f4a" src="diagram.png"></q-img>
     </div>
 </div>
 <div class="row">
-    <div class="st-col col-12 col-sm st-module">
+    <div class="st-col col-12 col-sm st-module" style="padding: 0px !important;">
         <plotly id="i8iv" :data="trace" :layout="layout" config="{'displaylogo':false}"></plotly>
     </div>
     <div id="ijtx" class="st-col st-module col-3">
         <q-select id="iyac5" v-model="selected_unknown" label="States to plot" :options="uknowns" :multiple="true" :use-chips="true"></q-select>
-        <q-input id="i9yu7" :dense="true" label="Duration (ms)" type="number" v-model="T"></q-input>
+        <q-input id="i9yu7" :dense="true" label="Duration (s)" type="number" v-model="T"></q-input>
         <div id="iixr2">
-            <q-btn id="iwqy" label="Simulate" v-on:click="simulate = true" :disable="simulate" color="dark"></q-btn>
+            <q-btn id="iwqy" label="Simulate" v-on:click="simulate = true" :disable="simulate" color="primary"></q-btn>
         </div>
     </div>
 </div>
@@ -27,19 +27,17 @@
         <div id="i986x"><span v-katex="{'options':{'errorColor':'#CC0000','displayMode':true,'throwOnError':false,'maxExpand':500,'strict':'warn','maxSize':'Infinity','allowedProtocols':[]},'expression':equations[selected_comp]}"></span></div>
     </div>
     <div class="st-col col-12 col-sm st-module">
-        <div class="st-col col">
             <h5>Parameters</h5>
-            <div v-for="(val,p) in components[selected_comp]['parameters']" class="st-col col">
-                <q-input id="i9n4d" label="p" v-model="components[selected_comp]['parameters'][p]" type="number"></q-input>
+            <div class="st-col col shortColumn">
+                <div v-for="(val,p) in components[selected_comp]['parameters']" class="st-col col">
+                    <q-input id="i9n4d" :label="p" v-model="components[selected_comp]['parameters'][p]" type="number"></q-input>
+                </div>
             </div>
-        </div>
     </div>
     <div class="st-col col-12 col-sm st-module">
-        <div class="st-col col">
             <h5>Initial state values</h5>
-            <div class="st-col col">
-                <q-input id="io9dk" v-for="(val,p) in components[selected_comp]['states']" label="p+'(t)'" v-model="components[selected_comp]['states'][p]" type="number"></q-input>
+            <div class="st-col col shortColumn">
+                <q-input id="io9dk" v-for="(val,p) in components[selected_comp]['states']" :label="p+'(t)'" v-model="components[selected_comp]['states'][p]" type="number"></q-input>
             </div>
-        </div>
     </div>
 </div>

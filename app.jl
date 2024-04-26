@@ -17,8 +17,8 @@ get_parameters(c) = parameters(c) == ModelingToolkit.defaults(c)
 length(d::Reactive{Dict{Symbol, Dict{String, Any}}}) = length(d.o.val)
 iterate(d::Reactive{Dict{Symbol, Dict{String, Any}}}) = iterate(d.o.val)
 to_float(x) = typeof(x) == String ? parse(Float64, x) : x
-default_values = vcat(ModelingToolkit.defaults(sys)..., u0)
-component_list = [pv_input, power_input, pv, mppt, batter, load, dc_pv, dc_batter, ground]
+default_values = vcat(ModelingToolkit.defaults(sys)..., u0) |> Dict
+component_list = [pv_input, power_input, pv, mppt, batter, load, dc_pv, dc_batter, ground] 
 unknowns_list = map(string, unknowns(sys))
 
 latex_eqs = Dict(string(c.name) => replace(latexify(equations(c)),"align"=>"aligned") for c in component_list)
@@ -35,8 +35,8 @@ end
 
 #= Stipple.render(v::SymbolicUtils.BasicSymbolic{Real}) = string(v) =#
 #= Stipple.stipple_parse(::String, v::SymbolicUtils.BasicSymbolic{Real}) = string(v) =#
-Stipple.stipple_parse(::Num,  n::String) = convert(Float64,n) |> Num
-Stipple.stipple_parse(n::String,::Num) = convert(Float64,n) |> Num
+#= Stipple.stipple_parse(::Num,  n::String) = convert(Float64,n) |> Num =#
+#= Stipple.stipple_parse(n::String,::Num) = convert(Float64,n) |> Num =#
 
 @app begin
     @in var=0
@@ -52,7 +52,6 @@ Stipple.stipple_parse(n::String,::Num) = convert(Float64,n) |> Num
                                                        x -> any(p -> isequal(p, x.first), parameters(c)),
                                                        ModelingToolkit.defaults(c)
                                                       )
-                                                #= (getproperty(c,Symbol(p)),ModelingToolkit.defaults(c)[p]) for p in parameters(c) )  =#
                                                )
                                   )
                                   )
@@ -66,7 +65,6 @@ Stipple.stipple_parse(n::String,::Num) = convert(Float64,n) |> Num
                                                        x -> any(p -> isequal(p, x.first), unknowns(c)),
                                                        ModelingToolkit.defaults(c)
                                                       )
-                                                #= (getproperty(c,Symbol(p)),ModelingToolkit.defaults(c)[p]) for p in parameters(c) )  =#
                                                )
                                   )
                               ))
@@ -78,21 +76,27 @@ Stipple.stipple_parse(n::String,::Num) = convert(Float64,n) |> Num
     @out y = zeros(1:500)*1.0
     @out trace=[scatter()]
     @out layout = PlotlyBase.Layout(
-        xaxis_title="step",
+                                    Dict{Symbol,Any}(:paper_bgcolor => "rgb(254, 247, 234)",
+                                     :plot_bgcolor => "rgb(254, 247, 234)");
+                                    xaxis_title="t (s)",
         legend=attr(
         x=1,
         y=1.02,
         yanchor="bottom",
         xanchor="right",
-        orientation="h"
+        orientation="h",
     ),
+         xaxis=attr(gridcolor="red"),
+         yaxis=attr(gridcolor="red"),
+                             margin=Dict(:l => 10, :r => 10, :b => 10, :t => 10),
+
     )
     @in selected_comp = :batter
     @out uknowns = unknowns_list
     @in selected_unknown = []
     @in txt = ""
     @in simulate = false
-    @in T = 100
+    @in T = 0.1
     @private S = DataFrame()
     @onchange isready begin
         simulate = true
@@ -105,20 +109,19 @@ Stipple.stipple_parse(n::String,::Num) = convert(Float64,n) |> Num
               batter.v_f => 0.1,
               batter.v_soc => 0.3
              ]
-        prob = ODEProblem(sys, u0, (0.0,T), param_values)
+        prob = ODEProblem(sys, u0, (0.0,T*1000), param_values)
         sol = solve(prob,Rosenbrock23(), callback = DiscreteCallback(condition,cb));
         sol_matrix = hcat(sol.u...)
-        x = sol.t
-        y = sol_matrix[1,:]
+        @show sol.t
         S = DataFrame(sol_matrix', unknowns_list)
-        insertcols!(S, 1, :t => collect(1:size(sol_matrix,2)))
+        insertcols!(S, 1, :t => sol.t)
         notify(__model__.selected_unknown)
     end
     @onchange selected_unknown begin
         #= trace = [scatter()] =#
         trace[!] = []
         for u in selected_unknown
-            push!(trace,scatter(x=S[!,:t], y=S[!,u],mode="lines", name=u))
+            push!(trace,scatter(x=S[!,:t]/1000, y=S[!,u],mode="lines", name=u))
         end
     trace = copy(trace)
     end
