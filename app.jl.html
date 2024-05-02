@@ -7,12 +7,12 @@
             </div>
         </div>
         <div class="row pt-10">
-            <div id="it9g5" class="st-col col-6 st-module p-5" style="padding-top: 25px !important;">
-                <q-img id="i8f4a" src="diagram.png"></q-img>
-            </div>
             <div class="st-col col-6  st-module pl-5 pr-5">
                 <h2>Solar panel MPPT</h2><br>
                 This dashboard simulates one of the examples in the <a href="https://ai4energy.github.io/Ai4EComponentLib.jl/dev/tutorials/Electrochemistry/#MPPT-Controller"> Ai4EComponentLib.jl</a> package, a library of ModelingToolkit models. The circuit implements a MPPT controller, which tracks the maximum voltage current (VI) value so that the system can charge the battery at the maximum power output.
+            </div>
+            <div id="it9g5" class="st-col col-6 st-module p-5" style="padding-top: 25px !important;">
+                <q-img id="i8f4a" src="diagram.png"></q-img>
             </div>
         </div>
     </div>
@@ -39,36 +39,35 @@
                     expand-separator
                     default-closed>
 
+                <q-expansion-item
+                        v-if="Object.keys(components[comp]['parameters']).length > 0"
+                        label="Parameters" icon="tune" class="b-2">
+                    <div v-for="(val, p) in components[comp]['parameters']" :key="p" class="bg-sky-900 pb-2">
+                        <q-input
+                                style="width:100%;max-width:80%"
+                                class="ml-10"
+                                :id="'param-' + comp + '-' + p"
+                                :label="p"
+                                v-model="components[comp]['parameters'][p]"
+                                type="number">
+                        </q-input>
+                    </div>
+                </q-expansion-item>
 
-<q-expansion-item
-                v-if="Object.keys(components[comp]['parameters']).length > 0"
-                label="Parameters" icon="tune" class="b-2">
-                <div v-for="(val, p) in components[comp]['parameters']" :key="p" class="bg-sky-900 pb-2">
-                    <q-input
-                        style="width:100%;max-width:80%"
-                        class="ml-10"
-                        :id="'param-' + comp + '-' + p"
-                        :label="p"
-                        v-model="components[comp]['parameters'][p]"
-                        type="number">
-                    </q-input>
-                </div>
-            </q-expansion-item>
-            
-            <q-expansion-item
-                v-if="Object.keys(components[comp]['states']).length > 0"
-                label="Initial state values" icon="timeline">
-                <div v-for="(val, p) in components[comp]['states']" :key="p" class="bg-sky-900 pb-2">
-                    <q-input
-                        style="width:100%;max-width:80%"
-                        class="ml-10"
-                        :id="'state-' + comp + '-' + p"
-                        :label="p + '(t)'"
-                        v-model="components[comp]['states'][p]"
-                        type="number">
-                    </q-input>
-                </div>
-            </q-expansion-item>
+                <q-expansion-item
+                        v-if="Object.keys(components[comp]['states']).length > 0"
+                        label="Initial state values" icon="timeline">
+                    <div v-for="(val, p) in components[comp]['states']" :key="p" class="bg-sky-900 pb-2">
+                        <q-input
+                                style="width:100%;max-width:80%"
+                                class="ml-10"
+                                :id="'state-' + comp + '-' + p"
+                                :label="p + '(t)'"
+                                v-model="components[comp]['states'][p]"
+                                type="number">
+                        </q-input>
+                    </div>
+                </q-expansion-item>
 
                 <q-expansion-item label="Equations" icon="functions">
                     <div class="shortColumn" class="bg-sky-900 pb-2">
@@ -76,7 +75,7 @@
                     </div>
                 </q-expansion-item>
             </q-expansion-item>
-        </div>
+</div>
         </div>
     </div>
 </div>
