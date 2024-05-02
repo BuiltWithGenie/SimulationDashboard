@@ -23,59 +23,65 @@
                 <div id="ijtx" class="st-col st-module col-12 pl-4 pr-4 pb-4">
                     <q-select id="iyac5" v-model="selected_unknown" label="States to plot" :options="uknowns" :multiple="true" :use-chips="true"></q-select>
                     <q-input id="i9yu7" :dense="true" label="Duration (s)" type="number" v-model="T"></q-input>
-                    <div id="iixr2">
+                    <div id="iixr2" style="flex">
                         <q-btn id="iwqy" label="Simulate" v-on:click="simulate = true" :disable="simulate" color="primary"></q-btn>
+                        <div style="margin-top:10px">
+                            <q-icon name="upload_file" size="25px" style="cursor:pointer;margin-right:10px"><q-popup-proxy>
+                                    <q-uploader label="Upload results" hide-upload-btn auto-upload v-on:failed="function(event) { handle_event(event, 'failed') }" v-on:uploaded="function(event) { handle_event(event, 'uploaded') }" no-thumbnails v-on:finish="function(event) { handle_event(event, 'finished') }" :url="'/____/upload/' + channel_" v-on:rejected="function(event) { handle_event(event, 'rejected') }" max-files=1 accept=".bson" style="max-width: 95%; width: 95%; margin: 0 auto;"></q-uploader>
+                                </q-popup-proxy></q-icon>
+                                <q-icon style="cursor:pointer;margin-left:10px" name="download" size="25px" v-on:click="function(event) { handle_event(event, 'download') }"/>
+                        </div>
                     </div>
                 </div>
             </div>
             <h5>Component configuration</h5>
-<div style="height: 400px; overflow-y: auto;">
-            <q-expansion-item
-                    v-for="comp in component_names"
-                    :key="comp"
-                    :label="comp"
-                    class="q-mb-sm b-2 border-white"
-                    style="border-width:1px;border-radius:5px;border-color:steelblue;"
-                    expand-separator
-                    default-closed>
-
+            <div style="height: 400px; overflow-y: auto;">
                 <q-expansion-item
-                        v-if="Object.keys(components[comp]['parameters']).length > 0"
-                        label="Parameters" icon="tune" class="b-2">
-                    <div v-for="(val, p) in components[comp]['parameters']" :key="p" class="bg-sky-900 pb-2">
-                        <q-input
-                                style="width:100%;max-width:80%"
-                                class="ml-10"
-                                :id="'param-' + comp + '-' + p"
-                                :label="p"
-                                v-model="components[comp]['parameters'][p]"
-                                type="number">
-                        </q-input>
-                    </div>
-                </q-expansion-item>
+                        v-for="comp in component_names"
+                        :key="comp"
+                        :label="comp"
+                        class="q-mb-sm b-2 border-white"
+                        style="border-width:1px;border-radius:5px;border-color:steelblue;"
+                        expand-separator
+                        default-closed>
 
-                <q-expansion-item
-                        v-if="Object.keys(components[comp]['states']).length > 0"
-                        label="Initial state values" icon="timeline">
-                    <div v-for="(val, p) in components[comp]['states']" :key="p" class="bg-sky-900 pb-2">
-                        <q-input
-                                style="width:100%;max-width:80%"
-                                class="ml-10"
-                                :id="'state-' + comp + '-' + p"
-                                :label="p + '(t)'"
-                                v-model="components[comp]['states'][p]"
-                                type="number">
-                        </q-input>
-                    </div>
-                </q-expansion-item>
+                    <q-expansion-item
+                            v-if="Object.keys(components[comp]['parameters']).length > 0"
+                            label="Parameters" icon="tune" class="b-2">
+                        <div v-for="(val, p) in components[comp]['parameters']" :key="p" class="bg-sky-900 pb-2">
+                            <q-input
+                                    style="width:100%;max-width:80%"
+                                    class="ml-10"
+                                    :id="'param-' + comp + '-' + p"
+                                    :label="p"
+                                    v-model="components[comp]['parameters'][p]"
+                                    type="number">
+                            </q-input>
+                        </div>
+                    </q-expansion-item>
 
-                <q-expansion-item label="Equations" icon="functions">
-                    <div class="shortColumn" class="bg-sky-900 pb-2">
-                        <span class="shortColumn" style="max-width:100%" v-katex="{'options':{'errorColor':'#CC0000','displayMode':true,'throwOnError':false,'maxExpand':500,'strict':'warn','maxSize':'Infinity','allowedProtocols':[]},'expression':equations[comp]}"></span>
-                    </div>
+                    <q-expansion-item
+                            v-if="Object.keys(components[comp]['states']).length > 0"
+                            label="Initial state values" icon="timeline">
+                        <div v-for="(val, p) in components[comp]['states']" :key="p" class="bg-sky-900 pb-2">
+                            <q-input
+                                    style="width:100%;max-width:80%"
+                                    class="ml-10"
+                                    :id="'state-' + comp + '-' + p"
+                                    :label="p + '(t)'"
+                                    v-model="components[comp]['states'][p]"
+                                    type="number">
+                            </q-input>
+                        </div>
+                    </q-expansion-item>
+
+                    <q-expansion-item label="Equations" icon="functions">
+                        <div class="shortColumn" class="bg-sky-900 pb-2">
+                            <span class="shortColumn" style="max-width:100%" v-katex="{'options':{'errorColor':'#CC0000','displayMode':true,'throwOnError':false,'maxExpand':500,'strict':'warn','maxSize':'Infinity','allowedProtocols':[]},'expression':equations[comp]}"></span>
+                        </div>
+                    </q-expansion-item>
                 </q-expansion-item>
-            </q-expansion-item>
-</div>
+            </div>
         </div>
     </div>
 </div>

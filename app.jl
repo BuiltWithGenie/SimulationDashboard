@@ -1,6 +1,6 @@
 #todo when modifying a number from the browser in an input, its type is changed to string int the backdend. perhaps because the number is stored in a dictionary without strict typing
-using GenieFramework, PlotlyBase, DataFrames, JLD2
-using StippleLatex, Latexify
+using GenieFramework, PlotlyBase, DataFrames, JLD2, BSON
+using StippleLatex, Latexify, StippleDownloads
 import Base: length, iterate
 include("mppt.jl")
 @genietools
@@ -19,11 +19,11 @@ get_parameters(c) = parameters(c) == ModelingToolkit.defaults(c)
 length(d::Reactive{Dict{Symbol, Dict{String, Any}}}) = length(d.o.val)
 iterate(d::Reactive{Dict{Symbol, Dict{String, Any}}}) = iterate(d.o.val)
 to_float(x) = typeof(x) == String ? parse(Float64, x) : x
-default_values = vcat(ModelingToolkit.defaults(sys)..., u0) |> Dict
-component_list = [PV_Input, Power_Input, PV, MPPT, Battery, Load, DC_PV, DC_Battery, Ground_] 
-unknowns_list = map(string, unknowns(sys))
+const default_values = vcat(ModelingToolkit.defaults(sys)..., u0) |> Dict
+const component_list = [PV_Input, Power_Input, PV, MPPT, Battery, Load, DC_PV, DC_Battery, Ground_] 
+const unknowns_list = map(string, unknowns(sys))
 
-latex_eqs = Dict(string(c.name) => replace(latexify(equations(c)),"align"=>"aligned") for c in component_list)
+const latex_eqs = Dict(string(c.name) => replace(latexify(equations(c)),"align"=>"aligned") for c in component_list)
 
 function build_param_dict(components)
     prob_params = []
@@ -35,40 +35,36 @@ function build_param_dict(components)
     prob_params
 end
 
-#= Stipple.render(v::SymbolicUtils.BasicSymbolic{Real}) = string(v) =#
-#= Stipple.stipple_parse(::String, v::SymbolicUtils.BasicSymbolic{Real}) = string(v) =#
-#= Stipple.stipple_parse(::Num,  n::String) = convert(Float64,n) |> Num =#
-#= Stipple.stipple_parse(n::String,::Num) = convert(Float64,n) |> Num =#
 component_config = Dict(c.name => 
-                          Dict(
-                               "name" => string(c.name), 
-                               "parameters" => 
-                               Dict(map(
-                                   x-> string(x.first) => x.second, 
-                                   collect(
-                                           Dict(
-                                                filter(
-                                                       x -> any(p -> isequal(p, x.first), parameters(c)),
-                                                       ModelingToolkit.defaults(c)
-                                                      )
-                                               )
-                                  )
-                                  )
-                              ),
-                               "states" => 
-                               Dict(map(
-                                        x-> replace(string(x.first), "(t)"=>"", "₊" => "." ) => x.second, 
-                                   collect(
-                                           Dict(
-                                                filter(
-                                                       x -> any(p -> isequal(p, x.first), unknowns(c)),
-                                                       ModelingToolkit.defaults(c)
-                                                      )
-                                               )
-                                  )
-                              ))
-                         )
-    for c in component_list)
+                        Dict(
+                             "name" => string(c.name), 
+                             "parameters" => 
+                             Dict(map(
+                                      x-> string(x.first) => x.second, 
+                                      collect(
+                                              Dict(
+                                                   filter(
+                                                          x -> any(p -> isequal(p, x.first), parameters(c)),
+                                                          ModelingToolkit.defaults(c)
+                                                         )
+                                                  )
+                                             )
+                                     )
+                                 ),
+                             "states" => 
+                             Dict(map(
+                                      x-> replace(string(x.first), "(t)"=>"", "₊" => "." ) => x.second, 
+                                      collect(
+                                              Dict(
+                                                   filter(
+                                                          x -> any(p -> isequal(p, x.first), unknowns(c)),
+                                                          ModelingToolkit.defaults(c)
+                                                         )
+                                                  )
+                                             )
+                                     ))
+                            )
+                        for c in component_list)
 
 @app begin
     @in var=0
@@ -80,20 +76,14 @@ component_config = Dict(c.name =>
     @out trace=[scatter()]
     @out layout = PlotlyBase.Layout(
                                     Dict{Symbol,Any}(:paper_bgcolor => "rgb(226, 232, 240)",
-                                     :plot_bgcolor => "rgb(226, 232, 240)");
+                                                     :plot_bgcolor => "rgb(226, 232, 240)");
                                     xaxis_title="t (s)",
-        legend=attr(
-        x=1,
-        y=1.02,
-        yanchor="bottom",
-        xanchor="right",
-        orientation="h",
-    ),
-         xaxis=attr(gridcolor="red", gridwidth=4),
-         yaxis=attr(gridcolor="red"),
-                             margin=Dict(:l => 10, :r => 10, :b => 10, :t => 10),
+                                    legend=attr( x=1, y=1.02, yanchor="bottom", xanchor="right", orientation="h",),
+                                    xaxis=attr(gridcolor="red", gridwidth=4),
+                                    yaxis=attr(gridcolor="red"),
+                                    margin=Dict(:l => 10, :r => 10, :b => 10, :t => 10),
 
-    )
+                                   )
     @in selected_comp = :Battery
     @out uknowns = unknowns_list
     @in selected_unknown = ["Battery₊v(t)", "MPPT₊in₊i(t)"]
@@ -101,7 +91,9 @@ component_config = Dict(c.name =>
     @in simulate = false
     @in T = 0.1
     @private S = sol_stored
+    @in download = false
     @onbutton simulate begin
+        @info "Running simulation..."
         param_values = Dict( eval(Meta.parse(c["name"]*"."*string(p.first))) => to_float(p.second) for c in values(components) for p in c["parameters"])
         state_values = Dict( eval(Meta.parse(c["name"]*"."*string(p.first))) => to_float(p.second) for c in values(components) for p in c["states"])
         u0 = [
@@ -113,39 +105,48 @@ component_config = Dict(c.name =>
         sol = solve(prob,Rosenbrock23());
         sol_matrix = hcat(sol.u...)
         S = DataFrame(sol_matrix', unknowns_list)
-        sol_stored = S
         insertcols!(S, 1, :t => sol.t)
-        #= @save "S.jld2" sol_stored =#
         notify(__model__.selected_unknown)
+        notify(__model__, "Simulation complete")
+        @info "Simulation completed"
+        solution = S # calling @save on S causes problems, need to make a non-observable copy
+        BSON.@save "S.bson" solution
     end
     @onchange isready,selected_unknown begin
-        @show selected_unknown
-        #= trace = [scatter()] =#
         trace[!] = []
         for u in selected_unknown
             push!(trace,scatter(x=S[!,:t]/1000, y=S[!,u],mode="lines", name=u))
         end
-    trace = copy(trace)
+        trace = copy(trace)
     end
 
-    #= @in u = [] =#
-    #= @onchange isready begin =#
-    #=     sol = solve(prob,Rosenbrock23()) =#
-    #= end =#
+    @event uploaded begin
+        notify(__model__, "Upload finished")
+        notify(__model__.selected_unknown)
+        @info "uploaded"
+    end
+    @onchange fileuploads begin
+        if ! isempty(fileuploads)
+            @info "File was uploaded: " fileuploads
+            BSON.@load fileuploads["path"]  sol_stored
+            S = sol_stored
+            rm(fileuploads["path"])
 
+            fileuploads = Dict{AbstractString,AbstractString}()
+        end
+    end
+    @event download begin
+        try
+            solution = S
+            io = IOBuffer()
+            BSON.@save io solution
+            seekstart(io)
+            download_binary(__model__, take!(io), "simulation.bson")
+        catch ex
+            println("Error during download: ", ex)
+        end
+    end
 end
 
-ui() = [
-        #= select(:selected_comp, options=:components, label="Component"), cell(@recur("c in components"),[textfield(var"v-model"="c", var":label"="c", var":name"="c")]) =#
-        plot(:trace),
-        btn("Simulate", @click(:simulate)),
-        select(:selected_comp, options=:component_names, label="Component"),
-        cell(class="flex", [
-                            cell(class = "w-1/2", [ h5("Parameters"),
-                                                   cell(class="w-1/2",@recur("(val,p) in components[selected_comp]['parameters']"),[textfield(var"v-model"="components[selected_comp]['parameters'][p]", var":label"="p", type="number")])]),
-                            cell(class="w-1/2", [h5("Initial values"),p("")]),
-       ])
-       ]
-#= @page("/",ui) =#
 @page("/", "app.jl.html")
 
