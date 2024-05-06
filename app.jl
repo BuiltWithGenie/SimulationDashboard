@@ -3,18 +3,12 @@ using GenieFramework, PlotlyBase, DataFrames, JLD2, BSON
 using StippleLatex, Latexify, StippleDownloads
 import Base: length, iterate
 include("mppt.jl")
-@genietools
 
 Stipple.Layout.add_script("https://cdn.tailwindcss.com")
 Stipple.Layout.add_script("https://cdn.jsdelivr.net/npm/@joint/core@4.0.1/dist/joint.js")
 
 @load "S.jld2" sol_stored
 
-#= cb(integrator) = println("$(integrator.u) $(integrator.t)") =#
-#= condition(u,t,integrator) = t%1000 == 0 =#
-#= sol = solve(prob,Rosenbrock23(), callback = DiscreteCallback(condition,cb)); =#
-
-#= get_parameters(c) = parameters(c) == Any[] ? [""] : parameters(c) =#
 get_parameters(c) = parameters(c) == ModelingToolkit.defaults(c)
 length(d::Reactive{Dict{Symbol, Dict{String, Any}}}) = length(d.o.val)
 iterate(d::Reactive{Dict{Symbol, Dict{String, Any}}}) = iterate(d.o.val)
@@ -25,20 +19,11 @@ const unknowns_list = map(string, unknowns(sys))
 
 const latex_eqs = Dict(string(c.name) => replace(latexify(equations(c)),"align"=>"aligned") for c in component_list)
 
-function build_param_dict(components)
-    prob_params = []
-    for c in values(components)
-        for p in c["parameters"]
-            push!(prob_params, p )
-        end
-    end
-    prob_params
-end
-
 component_config = Dict(c.name => 
                         Dict(
                              "name" => string(c.name), 
-                             "parameters" => 
+                             "equations" => replace(latexify(equations(c)),"align"=>"aligned"),
+                             "parameters" =>
                              Dict(map(
                                       x-> string(x.first) => x.second, 
                                       collect(
@@ -89,7 +74,7 @@ component_config = Dict(c.name =>
     @in selected_unknown = ["Battery₊v(t)", "MPPT₊in₊i(t)"]
     @in txt = ""
     @in simulate = false
-    @in T = 0.1
+    @in T = 1.5
     @private S = sol_stored
     @in download = false
     @onbutton simulate begin
@@ -109,8 +94,8 @@ component_config = Dict(c.name =>
         notify(__model__.selected_unknown)
         notify(__model__, "Simulation complete")
         @info "Simulation completed"
-        solution = S # calling @save on S causes problems, need to make a non-observable copy
-        BSON.@save "S.bson" solution
+        # solution = S # calling @save on S causes problems, need to make a non-observable copy
+        # BSON.@save "S.bson" solution
     end
     @onchange isready,selected_unknown begin
         trace[!] = []
@@ -150,3 +135,6 @@ end
 
 @page("/", "app.jl.html")
 
+include("components/utils.jl")
+load_component("component-props")
+register_normal_element("component__props", context = @__MODULE__)
