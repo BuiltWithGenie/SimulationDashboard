@@ -3,39 +3,15 @@
 </header>
 <div class="row">
     <div class="st-col col-12 col-sm st-module">
-        <plotly id="i8iv" :data="trace" :layout="layout" config="{'displaylogo':false}"></plotly>
-        <div class="row pt-10">
-            <div class="st-col col-4 st-module pl-5 pr-5 pb-5">
-                <h2>Simulation description</h2><br>
-                This dashboard simulates one of the examples in the <a href="https://ai4energy.github.io/Ai4EComponentLib.jl/dev/tutorials/Electrochemistry/#MPPT-Controller"> Ai4EComponentLib.jl</a> package, a library of ModelingToolkit models. The circuit implements a MPPT controller, which tracks the maximum voltage current (VI) value so that the system can charge the battery at the maximum power output.
-            </div>
-            <div id="it9g5" class="st-col col-8 st-module p-5">
-                <q-img id="i8f4a" class="mt-10" src="diagram.svg"></q-img>
-            </div>
-        </div>
+        <div class="row"></div>
+        <plotly id="ii5bq" data="W3siZ2J0eXBlIjoiTGluZSBDaGFydCIsIngiOiIkX3tTLnR9IiwidHlwZSI6InNjYXR0ZXIiLCJtb2RlIjoibGluZXMiLCJuYW1lIjoiVHJhY2UiLCJ5IjoiJF97Uy50fSJ9XQ==" config="e30=" layout="eyJ0aXRsZSI6Ik15IENoYXJ0In0="></plotly>
+        <q-img id="i7p3x" src="/diagram.svg"></q-img>
+        <div class="row"></div>
     </div>
-    <div class="st-col st-module col-3">
-        <div class="row">
-            <h5>Simulation parameters</h5>
-            <div id="ijtx" class="st-col st-module col-12 pl-4 pr-4 pb-4">
-                <q-select id="iyac5" v-model="selected_unknown" label="States to plot" :options="uknowns" :multiple="true" :use-chips="true"></q-select>
-                <q-input id="i9yu7" :dense="true" label="Duration (s)" type="number" v-model="T"></q-input>
-                <div id="iixr2">
-                    <q-btn id="iwqy" class="mt-5 mb-5" label="Simulate" v-on:click="simulate = true" :disable="simulate" color="primary"></q-btn>
-                    <div id="iqw6z">
-                        <q-icon id="il6ko" class="mr-4" name="upload_file" size="25px">
-                            <q-popup-proxy>
-                                <q-uploader label="Upload results" hide-upload-btn="" auto-upload="" v-on:failed="function(event) { handle_event(event, 'failed') }" v-on:uploaded="function(event) { handle_event(event, 'uploaded') }" no-thumbnails="" v-on:finish="function(event) { handle_event(event, 'finished') }" :url="'/____/upload/' + channel_" v-on:rejected="function(event) { handle_event(event, 'rejected') }" max-files="1" accept=".bson" id="iph8d"></q-uploader>
-                            </q-popup-proxy>
-                        </q-icon>
-                        <q-icon v-on:click="function(event) { handle_event(event, 'download') }" id="itgfn" class="ml-4" name="arrow_downward" size="25px"></q-icon>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="i4yqp">
-            <h5>Component configuration</h5>
-            <component-props :components="components"></component-props>
-        </div>
+    <div id="ifr2b" class="st-col st-module col-3">
+        <h6>Header Content</h6>
+        <q-select id="ipp8i" v-model="undefined" label="Choices" :options="[]"></q-select>
+        <q-input id="iulxr" v-model="undefined" :dense="true" label="Input"></q-input>
+        <q-btn id="i3f5h" color="primary" icon="offline_bolt" label="Simulate" v-on:click="simulate = true"></q-btn>
     </div>
 </div>
