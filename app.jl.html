@@ -21,14 +21,14 @@
                 <q-select id="iyac5" v-model="selected_unknown" label="States to plot" :options="uknowns" :multiple="true" :use-chips="true"></q-select>
                 <q-input id="i9yu7" :dense="true" label="Duration (s)" type="number" v-model="T"></q-input>
                 <div id="iixr2">
-                    <q-btn id="iwqy" label="Simulate" v-on:click="simulate = true" :disable="simulate" color="primary"></q-btn>
+                    <q-btn id="iwqy" class="mt-5 mb-5" label="Simulate" v-on:click="simulate = true" :disable="simulate" color="primary"></q-btn>
                     <div id="iqw6z">
-                        <q-icon id="il6ko" name="upload_file" size="25px">
+                        <q-icon id="il6ko" class="mr-4" name="upload_file" size="25px">
                             <q-popup-proxy>
                                 <q-uploader label="Upload results" hide-upload-btn="" auto-upload="" v-on:failed="function(event) { handle_event(event, 'failed') }" v-on:uploaded="function(event) { handle_event(event, 'uploaded') }" no-thumbnails="" v-on:finish="function(event) { handle_event(event, 'finished') }" :url="'/____/upload/' + channel_" v-on:rejected="function(event) { handle_event(event, 'rejected') }" max-files="1" accept=".bson" id="iph8d"></q-uploader>
                             </q-popup-proxy>
                         </q-icon>
-                        <q-icon v-on:click="function(event) { handle_event(event, 'download') }" id="itgfn" name="arrow_downward" size="25px"></q-icon>
+                        <q-icon v-on:click="function(event) { handle_event(event, 'download') }" id="itgfn" class="ml-4" name="arrow_downward" size="25px"></q-icon>
                     </div>
                 </div>
             </div>

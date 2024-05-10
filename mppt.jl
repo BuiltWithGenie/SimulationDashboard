@@ -51,3 +51,38 @@ Battery.v_soc = 0.3
 #= sol = solve(prob,Rosenbrock23(), callback = DiscreteCallback(condition,cb)); =#
 #
 
+const unknowns_list = map(string, unknowns(sys))
+# Generate a dictionary with all the components in the system
+const component_list = [PV_Input, Power_Input, PV, MPPT, Battery, Load, DC_PV, DC_Battery, Ground_] 
+component_config = Dict(c.name => 
+                        Dict(
+                             "name" => string(c.name), 
+                             "equations" => replace(latexify(equations(c)),"align"=>"aligned"),
+                             "parameters" =>
+                             Dict(map(
+                                      x-> string(x.first) => x.second, 
+                                      collect(
+                                              Dict(
+                                                   filter(
+                                                          x -> any(p -> isequal(p, x.first), parameters(c)),
+                                                          ModelingToolkit.defaults(c)
+                                                         )
+                                                  )
+                                             )
+                                     )
+                                 ),
+                             "states" => 
+                             Dict(map(
+                                      x-> replace(string(x.first), "(t)"=>"", "₊" => "." ) => x.second, 
+                                      collect(
+                                              Dict(
+                                                   filter(
+                                                          x -> any(p -> isequal(p, x.first), unknowns(c)),
+                                                          ModelingToolkit.defaults(c)
+                                                         )
+                                                  )
+                                             )
+                                     ))
+                            )
+                        for c in component_list)
+

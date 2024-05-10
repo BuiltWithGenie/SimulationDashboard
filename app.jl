@@ -1,7 +1,6 @@
 #todo when modifying a number from the browser in an input, its type is changed to string int the backdend. perhaps because the number is stored in a dictionary without strict typing
 using GenieFramework, PlotlyBase, DataFrames, JLD2, BSON
 using StippleLatex, Latexify, StippleDownloads
-import Base: length, iterate
 include("mppt.jl")
 
 Stipple.Layout.add_script("https://cdn.tailwindcss.com")
@@ -9,53 +8,10 @@ Stipple.Layout.add_script("https://cdn.jsdelivr.net/npm/@joint/core@4.0.1/dist/j
 
 @load "S.jld2" sol_stored
 
-get_parameters(c) = parameters(c) == ModelingToolkit.defaults(c)
-length(d::Reactive{Dict{Symbol, Dict{String, Any}}}) = length(d.o.val)
-iterate(d::Reactive{Dict{Symbol, Dict{String, Any}}}) = iterate(d.o.val)
 to_float(x) = typeof(x) == String ? parse(Float64, x) : x
-const default_values = vcat(ModelingToolkit.defaults(sys)..., u0) |> Dict
-const component_list = [PV_Input, Power_Input, PV, MPPT, Battery, Load, DC_PV, DC_Battery, Ground_] 
-const unknowns_list = map(string, unknowns(sys))
-
-const latex_eqs = Dict(string(c.name) => replace(latexify(equations(c)),"align"=>"aligned") for c in component_list)
-
-component_config = Dict(c.name => 
-                        Dict(
-                             "name" => string(c.name), 
-                             "equations" => replace(latexify(equations(c)),"align"=>"aligned"),
-                             "parameters" =>
-                             Dict(map(
-                                      x-> string(x.first) => x.second, 
-                                      collect(
-                                              Dict(
-                                                   filter(
-                                                          x -> any(p -> isequal(p, x.first), parameters(c)),
-                                                          ModelingToolkit.defaults(c)
-                                                         )
-                                                  )
-                                             )
-                                     )
-                                 ),
-                             "states" => 
-                             Dict(map(
-                                      x-> replace(string(x.first), "(t)"=>"", "₊" => "." ) => x.second, 
-                                      collect(
-                                              Dict(
-                                                   filter(
-                                                          x -> any(p -> isequal(p, x.first), unknowns(c)),
-                                                          ModelingToolkit.defaults(c)
-                                                         )
-                                                  )
-                                             )
-                                     ))
-                            )
-                        for c in component_list)
-
 @app begin
     @in var=0
     @in components = component_config
-    @out component_names = [c.name for c in component_list]
-    @out equations = latex_eqs
     @out x = collect(1:5000)*1.0
     @out y = zeros(1:500)*1.0
     @out trace=[scatter()]
