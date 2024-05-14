@@ -5,6 +5,10 @@ to_float(x) = typeof(x) == String ? parse(Float64, x) : x
 
 symbolic_dict(components, key) = Dict( eval(Meta.parse(c["name"]*"."*string(p.first))) => to_float(p.second) for c in values(components) for p in c[key])
 
+function trigger_handler(rvar)
+    eval(:(notify(__model__.$(rvar))))
+end
+
 function load_component(name)
     component_code() = [script(read("components/$name.js", String))]
     @deps Main_ReactiveModel component_code

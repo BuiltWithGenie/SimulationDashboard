@@ -4,14 +4,13 @@
 <div class="row">
     <div class="st-col col-12 col-sm st-module">
         <div class="row"></div>
-        <plotly id="ii5bq" data="W3siZ2J0eXBlIjoiTGluZSBDaGFydCIsIngiOiIkX3tTLnR9IiwidHlwZSI6InNjYXR0ZXIiLCJtb2RlIjoibGluZXMiLCJuYW1lIjoiVHJhY2UiLCJ5IjoiJF97Uy50fSJ9XQ==" config="e30=" layout="eyJ0aXRsZSI6Ik15IENoYXJ0In0="></plotly>
         <q-img id="i7p3x" src="/diagram.svg"></q-img>
         <div class="row"></div>
     </div>
     <div id="ifr2b" class="st-col st-module col-3">
         <h6>Header Content</h6>
-        <q-select id="ipp8i" v-model="undefined" label="Choices" :options="[]"></q-select>
+        <q-select id="icmvs" v-model="undefined" label="Choices" :options="selected_states"></q-select>
         <q-input id="iulxr" v-model="undefined" :dense="true" label="Input"></q-input>
-        <q-btn id="i3f5h" color="primary" icon="offline_bolt" label="Simulate" v-on:click="simulate = true"></q-btn>
+        <q-btn id="i3f5h" color="primary" icon="offline_bolt" label="Simulate" v-on:click="simulate = !simulate"></q-btn>
     </div>
 </div>

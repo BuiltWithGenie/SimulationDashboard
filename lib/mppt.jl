@@ -1,5 +1,6 @@
 using Ai4EComponentLib.Electrochemistry, Ai4EComponentLib
 using ModelingToolkit
+using Latexify
 using IfElse: ifelse
 using DifferentialEquations
 #= using Plots =#
@@ -54,6 +55,7 @@ Battery.v_soc = 0.3
 const unknowns_list = map(string, unknowns(sys))
 # Generate a dictionary with all the components in the system
 const component_list = [PV_Input, Power_Input, PV, MPPT, Battery, Load, DC_PV, DC_Battery, Ground_] 
+
 component_config = Dict(c.name => 
                         Dict(
                              "name" => string(c.name), 
