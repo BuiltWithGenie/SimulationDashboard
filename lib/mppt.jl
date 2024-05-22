@@ -3,6 +3,7 @@ using ModelingToolkit
 using Latexify
 using IfElse: ifelse
 using DifferentialEquations
+include("utils.jl")
 #= using Plots =#
 
 global power = zeros(1000).+50.0
@@ -88,3 +89,5 @@ component_config = Dict(c.name =>
                             )
                         for c in component_list)
 
+param_values = symbolic_dict(component_config, "parameters")
+state_values = symbolic_dict(component_config, "states")

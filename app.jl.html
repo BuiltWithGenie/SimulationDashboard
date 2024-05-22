@@ -1,5 +1,22 @@
-<q-toolbar id="i3lf" class="text-primary">
-    <q-btn id="ispq" :dense="true" :flat="true" icon="menu" label="true" :round="true"></q-btn>
-    <q-toolbar-title>Toolbar</q-toolbar-title>
-</q-toolbar>
-<q-table id="ijeur" :data="[]" :dense="true"></q-table>
+<div id="gbTemplateContainer-2" class="container">
+    <header>
+        <h1 id="i37x">Photovoltaic charge controller </h1>
+    </header>
+    <div class="row">
+        <div id="ih35g" class="st-col col-12 col-sm st-module">
+            <dynamic-plotly id="il6jg" :data-frame="plot_data" x-column="t"></dynamic-plotly>
+            <plotly id="icy3d" data="W3siZ2J0eXBlIjoiTGluZSBDaGFydCIsIngiOiIkX3twbG90X2RhdGEudH0iLCJ5IjoiJF97c3RlcH0iLCJ0eXBlIjoic2NhdHRlciIsIm1vZGUiOiJtYXJrZXJzIiwibmFtZSI6IlRyYWNlIiwibWFya2VyIjp7InNpemUiOiIxIiwiY29sb3IiOiIjMDAwMDAwIn0sImxpbmUiOnsiY29sb3IiOiIjODg4In19XQ==" config="eyJhdXRvc2l6YWJsZSI6ZmFsc2V9" layout="eyJtYXJnaW4iOnsiYiI6IjAiLCJ0IjoiMzAiLCJyIjoiMCIsImwiOiIwIn0sImhlaWdodCI6IjgwIiwic2hvd2dyaWQiOmZhbHNlLCJ4YXhpcyI6eyJzaG93Z3JpZCI6ZmFsc2UsInJhbmdlIjoiJF97eHJhbmdlfSIsInZpc2libGUiOmZhbHNlfSwieWF4aXMiOnsic2hvd2dyaWQiOmZhbHNlfX0="></plotly>
+            <q-img id="i6l3l" class="mt-10" src="diagram.svg"></q-img>
+            <div class="row"></div>
+        </div>
+        <div id="isubp" class="st-col st-module col-3">
+            <h5 id="i1nhi">Simulation parameters</h5>
+            <q-select id="iyac5" label="States to plot" :multiple="true" :use-chips="true" :options="states" v-model="selected_states"></q-select>
+            <q-slider id="ivdik" v-model="T" color="primary" :label="true" :max="5" :min="1" :step="0.5" :markers="true"></q-slider>
+            <div class="row justify-center">
+                <q-btn id="iwqy" label="Simulate" v-on:click="simulate = true" color="primary" icon="timer" :loading="simulate"></q-btn>
+            </div>
+            <div class="row"></div>
+        </div>
+    </div>
+</div>

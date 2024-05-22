@@ -150,3 +150,7 @@ svg .draglayer {
 .container{
     max-width: 100%;
 }
+
+.st-col{
+  min-height:200px;
+}
