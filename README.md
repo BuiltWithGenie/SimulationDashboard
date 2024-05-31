@@ -2,6 +2,8 @@
 
 A dashboard to simulate one of the examples in the [Ai4EComponentLib.jl](https://ai4energy.github.io) package, which is a library of ModelingToolkit packages. The circuit implements a MPPT controller, which  tracks the maximum voltage current (VI) value so that the system can charge the battery at the maximum power output.
 
+For the code used in the **JuliaHub webinar**, which implements a slightly simpler app, check the [webinar](https://github.com/BuiltWithGenie/SimulationDashboard/tree/webinar) branch
+
 ![screenshot](https://github.com/GenieFramework/Genie.jl/raw/master/docs/content/img/genie.gif)
 
 ## Installation
