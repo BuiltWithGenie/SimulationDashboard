@@ -1,5 +1,6 @@
 using GenieFramework, PlotlyBase, DataFrames, JLD2, BSON
 using StippleLatex, StippleDownloads
+@genietools
 
 # enable TailwindCSS
 Stipple.Layout.add_script("https://cdn.tailwindcss.com")
